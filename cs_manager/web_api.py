@@ -116,6 +116,29 @@ def build_game_state(gs):
     }
 
 
+def mental_label(mental) -> str:
+    """Convert mental dict {confidence, motivation, tilt_resistance} to a readable label."""
+    if isinstance(mental, str):
+        return mental
+    if not isinstance(mental, dict):
+        return "stable"
+    conf = mental.get("confidence", 50)
+    motiv = mental.get("motivation", 50)
+    tilt = mental.get("tilt_resistance", 50)
+    avg = (conf + motiv + tilt) / 3
+    if avg >= 75:
+        return "confident"
+    if avg >= 60:
+        return "motivated"
+    if avg >= 40:
+        return "stable"
+    if tilt < 30:
+        return "tilted"
+    if conf < 30:
+        return "nervous"
+    return "stable"
+
+
 def build_player_card(gs, player_id, is_academy=False):
     p = gs["players"].get(player_id, {})
     if not p:
@@ -133,7 +156,7 @@ def build_player_card(gs, player_id, is_academy=False):
         "salary": p.get("salary", 5000),
         "contract_years": p.get("contract_years", 1),
         "form": p.get("form", [])[-5:],
-        "mental": p.get("mental", "stable"),
+        "mental": mental_label(p.get("mental", "stable")),
         "is_academy": is_academy,
         "org_id": p.get("org_id"),
         "attributes": {k: round(float(v), 1) for k, v in attrs.items()},
