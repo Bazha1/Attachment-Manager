@@ -104,6 +104,23 @@ def build_player_card(gs, player_id, is_academy=False):
     if not isinstance(hltv, (int, float)):
         hltv = 1.0
 
+    # Match history from player stats
+    raw_history = stats.get("match_history", [])
+    match_history = []
+    for m in raw_history:
+        if isinstance(m, dict):
+            match_history.append({
+                "year":     m.get("year", 0),
+                "month":    m.get("month", 0),
+                "opponent": m.get("opponent", ""),
+                "won":      m.get("won", False),
+                "kills":    m.get("kills", 0),
+                "deaths":   m.get("deaths", 0),
+                "hltv":     m.get("hltv", 0),
+                "perf":     m.get("perf", 0),
+            })
+    match_history.reverse()  # newest first
+
     return {
         "id":             player_id,
         "name":           full_name,
@@ -121,6 +138,7 @@ def build_player_card(gs, player_id, is_academy=False):
         "org_id":         p.get("org_id"),
         "attributes":     {k: round(float(v), 1) for k, v in attrs.items()
                            if isinstance(v, (int, float))},
+        "match_history":  match_history[:10],
     }
 
 
@@ -534,6 +552,7 @@ def handle_get_rankings():
         return []
 
     result = []
+    player_rank = None
     for i, (oid, pts) in enumerate(rankings[:30]):
         org = gs["orgs"].get(oid, {})
         result.append({
@@ -545,6 +564,29 @@ def handle_get_rankings():
             "points":        int(pts),
             "is_player_org": oid == org_id,
         })
+        if oid == org_id:
+            player_rank = i + 1
+
+    # If player org is outside top 30, append it
+    if player_rank is None and org_id:
+        from engine.ranking_engine import get_rank
+        player_rank = get_rank(gs, org_id)
+        if player_rank:
+            player_org = gs["orgs"].get(org_id, {})
+            pts = 0
+            for oid, p in rankings:
+                if oid == org_id:
+                    pts = p
+                    break
+            result.append({
+                "rank":          player_rank,
+                "org_id":        org_id,
+                "name":          player_org.get("name", ""),
+                "tag":           player_org.get("tag", ""),
+                "region":        player_org.get("region", ""),
+                "points":        int(pts),
+                "is_player_org": True,
+            })
     return result
 
 
@@ -658,10 +700,8 @@ def handle_get_results():
             maps_won, maps_lost = 0, 0
 
         opponent = r.get("opponent", "?")
-        if not is_win:
-            # score stored from winner perspective if we lost; swap
-            maps_won, maps_lost = maps_lost, maps_won
-
+        # Score is always stored from org's perspective (our score first)
+        # So parts[0] is our score, parts[1] is opponent's score
         results.append({
             "tournament_name": f"Week {r.get('month', 1)}/{r.get('year', 2025)}",
             "team_a":          org_name,

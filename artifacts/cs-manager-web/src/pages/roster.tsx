@@ -150,13 +150,11 @@ export default function RosterPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-bold text-sm truncate">{p.alias || p.name}</span>
                   <RoleTag role={p.role} />
-                </div>
-                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs text-muted-foreground">{p.nationality}</span>
                   <span className="text-xs text-muted-foreground">Age {p.age}</span>
                   <MentalTag mental={p.mental} />
                 </div>
-                <div className="flex items-center gap-2 mt-1.5">
+                <div className="flex items-center gap-1 mt-1.5">
                   {(p.form ?? []).slice(-5).map((f, i) => (
                     <span
                       key={i}
@@ -168,6 +166,24 @@ export default function RosterPage() {
                     </span>
                   ))}
                 </div>
+                {p.match_history && p.match_history.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    <div className="text-[10px] text-muted-foreground uppercase font-bold">Last 5 Matches</div>
+                    <div className="flex flex-wrap gap-1">
+                      {p.match_history.slice(0, 5).map((m, i) => (
+                        <span
+                          key={i}
+                          className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                            m.won ? "bg-green-500/10 text-green-400" : "bg-red-500/10 text-red-400"
+                          }`}
+                          title={`vs ${m.opponent} — ${m.kills}/${m.deaths} @ ${m.hltv}`}
+                        >
+                          {m.won ? "W" : "L"} {m.kills}/{m.deaths} {m.hltv}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-3 ml-2 flex-shrink-0">
                 <div className="text-right">

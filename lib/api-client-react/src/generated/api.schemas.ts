@@ -85,6 +85,17 @@ export interface AdvanceResult {
 
 export type PlayerCardAttributes = {[key: string]: number};
 
+export interface PlayerMatchEntry {
+  year: number;
+  month: number;
+  opponent: string;
+  won: boolean;
+  kills: number;
+  deaths: number;
+  hltv: number;
+  perf: number;
+}
+
 export interface PlayerCard {
   id: string;
   name: string;
@@ -102,6 +113,7 @@ export interface PlayerCard {
   /** @nullable */
   org_id?: string | null;
   attributes?: PlayerCardAttributes;
+  match_history?: PlayerMatchEntry[];
 }
 
 export interface ContractedPlayer extends PlayerCard {

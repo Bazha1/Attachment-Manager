@@ -126,6 +126,7 @@ def simulate_match(org_a: dict, org_b: dict, players: dict,
                    match_format: str = "bo3",
                    tournament_tier: str = "tier2",
                    pressure_a: int = 30, pressure_b: int = 30,
+                   year: int = 0, month: int = 0,
                    verbose: bool = False) -> dict:
     """
     Full match simulation.  Returns a rich result dict.
@@ -169,11 +170,15 @@ def simulate_match(org_a: dict, org_b: dict, players: dict,
     for s in stats_a:
         p = players.get(s["player_id"])
         if p: record_match_stats(p, s["kills"], s["deaths"],
-                                  maps_played * 24, s["hltv"], s["perf"])
+                                  maps_played * 24, s["hltv"], s["perf"],
+                                  year=year, month=month,
+                                  opponent=org_b["name"], won=winner_won)
     for s in stats_b:
         p = players.get(s["player_id"])
         if p: record_match_stats(p, s["kills"], s["deaths"],
-                                  maps_played * 24, s["hltv"], s["perf"])
+                                  maps_played * 24, s["hltv"], s["perf"],
+                                  year=year, month=month,
+                                  opponent=org_a["name"], won=not winner_won)
 
     # Update mental states
     result_a = "W" if winner_won else "L"

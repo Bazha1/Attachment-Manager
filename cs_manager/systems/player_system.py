@@ -171,7 +171,9 @@ def reset_season_stats(player: dict) -> None:
 
 
 def record_match_stats(player: dict, kills: int, deaths: int,
-                       rounds: int, hltv: float, perf: float) -> None:
+                       rounds: int, hltv: float, perf: float,
+                       year: int = 0, month: int = 0,
+                       opponent: str = "", won: bool = False) -> None:
     s = player["stats"]
     s["career_kills"]   += kills
     s["career_deaths"]  += deaths
@@ -185,6 +187,30 @@ def record_match_stats(player: dict, kills: int, deaths: int,
     s["hltv_rating"] = round(s["hltv_rating"] * (1 - alpha) + hltv * alpha, 2)
     s["performance_rating"] = round(
         s["performance_rating"] * (1 - alpha) + perf * alpha, 1)
+    # Match-by-match history
+    s.setdefault("match_history", [])
+    s["match_history"].append({
+        "year":     year,
+        "month":    month,
+        "opponent": opponent,
+        "won":      won,
+        "kills":    kills,
+        "deaths":   deaths,
+        "hltv":     round(hltv, 2),
+        "perf":     round(perf, 1),
+    })
+    # Keep last 50 matches
+    s["match_history"] = s["match_history"][-50:]
+    # Update career history
+    if opponent:
+        player.setdefault("career_history", [])
+        player["career_history"].append({
+            "year":     year,
+            "month":    month,
+            "event":    "match",
+            "opponent": opponent,
+            "won":      won,
+        })
 
 
 def get_display_name(player: dict) -> str:

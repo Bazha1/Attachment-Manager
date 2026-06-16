@@ -129,6 +129,16 @@ def _create_league(gs: dict, region: str, phase: str,
     random.shuffle(all_region)
     while len(participants) < LEAGUE_SIZE and all_region:
         participants.append(all_region.pop())
+    # Ensure player team is included in their region's league
+    player_org_id = gs.get("player_org_id")
+    if player_org_id:
+        player_org = gs["orgs"].get(player_org_id)
+        if player_org and player_org.get("region") == region:
+            if player_org_id not in participants:
+                if len(participants) >= LEAGUE_SIZE:
+                    # Remove the lowest-ranked team to make room
+                    participants = participants[:LEAGUE_SIZE - 1]
+                participants.append(player_org_id)
     # Mark them as in league
     for oid in participants:
         gs["orgs"][oid]["in_league"] = True
@@ -155,7 +165,8 @@ def _run_league_week(gs: dict, tourn: dict, region: str) -> list:
             continue
         result = simulate_match(org_a, org_b, gs["players"],
                                 match_format="bo3",
-                                tournament_tier="regional")
+                                tournament_tier="regional",
+                                year=gs["year"], month=gs["month"])
         w_id = result["winner"]
         l_id = result["loser"]
         sa = int(result["score"].split("-")[0])
@@ -167,10 +178,14 @@ def _run_league_week(gs: dict, tourn: dict, region: str) -> list:
         update_ranking_points(gs, l_id, 20, gs["year"], gs["month"])
         w_org = gs["orgs"][w_id]
         l_org = gs["orgs"][l_id]
+        # Winner's score from result dict (parts[0] for winner, parts[1] for loser)
+        score_parts = result["score"].split("-")
+        w_score = score_parts[0]
+        l_score = score_parts[1] if len(score_parts) > 1 else "0"
         record_result(w_org, "W", gs["orgs"][l_id]["name"],
-                      result["score"], gs["year"], gs["month"])
+                      f"{w_score}-{l_score}", gs["year"], gs["month"])
         record_result(l_org, "L", gs["orgs"][w_id]["name"],
-                      result["score"], gs["year"], gs["month"])
+                      f"{l_score}-{w_score}", gs["year"], gs["month"])
         update_reputation(w_org, "W", "regional")
         update_reputation(l_org, "L", "regional")
         # Detect upset (lower-ranked team beats higher)
@@ -199,7 +214,11 @@ def _finalise_league(gs: dict, tourn: dict, region: str) -> list:
             "name": tourn["name"], "year": gs["year"]})
         news_tournament_winner(gs, gs["orgs"][winner_id]["name"], tourn["name"])
     # Relegation
+    player_org_id = gs.get("player_org_id")
     for oid in standings[-3:]:
+        # Skip player team from relegation
+        if oid == player_org_id:
+            continue
         gs["orgs"][oid]["in_league"] = False
         news_relegation(gs, gs["orgs"][oid]["name"], region)
     # Qualification for next Major (top N teams)
@@ -276,7 +295,8 @@ def _run_se_tournament(gs: dict, tourn: dict) -> list:
                 continue
             result = simulate_match(org_a, org_b, gs["players"],
                                     match_format="bo3",
-                                    tournament_tier=tourn["type"])
+                                    tournament_tier=tourn["type"],
+                                    year=gs["year"], month=gs["month"])
             m["played"] = True
             m["winner"] = result["winner"]
             m["score"]  = result["score"]
@@ -373,7 +393,8 @@ def _run_ti(gs: dict, year: int) -> list:
             result = simulate_match(org_a, org_b, gs["players"],
                                     match_format="bo3",
                                     tournament_tier="ti",
-                                    pressure_a=70, pressure_b=70)
+                                    pressure_a=70, pressure_b=70,
+                                    year=gs["year"], month=gs["month"])
             rec = record_swiss_match(tourn, result["winner"], result["loser"])
             record_result(gs["orgs"][result["winner"]], "W",
                           gs["orgs"][result["loser"]]["name"],
