@@ -1,1 +1,2 @@
 - [CS Manager game](cs-manager.md) — full Python console game in cs_manager/; run with `cd cs_manager && python3 main.py`; no external deps.
+- [CS Manager web bridge](cs-manager-web.md) — React+Vite frontend + Node api-server calling Python via spawn stdin/stdout; critical stdout redirect fix required.

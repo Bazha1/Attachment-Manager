@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "CS Manager"
+version = "1.0.0"
+id = "artifacts/cs-manager-web"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19690
+
+[services.development]
+run = "pnpm --filter @workspace/cs-manager-web run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cs-manager-web", "run", "build" ]
+publicDir = "artifacts/cs-manager-web/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19690"
+BASE_PATH = "/"

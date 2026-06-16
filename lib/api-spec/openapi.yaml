@@ -1,22 +1,22 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: CS Manager game API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: game
+    description: Game operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +24,236 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /game/orgs:
+    get:
+      operationId: listOrgs
+      tags: [game]
+      summary: List all orgs for new game org selection
+      responses:
+        "200":
+          description: List of orgs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrgSummary"
+
+  /game/new:
+    post:
+      operationId: newGame
+      tags: [game]
+      summary: Start a new game
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewGameInput"
+      responses:
+        "200":
+          description: Game state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameState"
+
+  /game/state:
+    get:
+      operationId: getGameState
+      tags: [game]
+      summary: Get current game state summary
+      responses:
+        "200":
+          description: Game state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameState"
+        "404":
+          description: No active game
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /game/advance:
+    post:
+      operationId: advanceWeek
+      tags: [game]
+      summary: Advance one week and simulate world events
+      responses:
+        "200":
+          description: Updated game state with week events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdvanceResult"
+
+  /game/roster:
+    get:
+      operationId: getRoster
+      tags: [game]
+      summary: Get player org full roster and academy
+      responses:
+        "200":
+          description: Roster data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RosterData"
+
+  /game/roster/release/{playerId}:
+    post:
+      operationId: releasePlayer
+      tags: [game]
+      summary: Release a player from the roster
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated roster
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RosterData"
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /game/roster/sign/{playerId}:
+    post:
+      operationId: signPlayer
+      tags: [game]
+      summary: Sign a free agent
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated roster
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RosterData"
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /game/academy/promote/{playerId}:
+    post:
+      operationId: promotePlayer
+      tags: [game]
+      summary: Promote a player from academy to main roster
+      parameters:
+        - name: playerId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated roster
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RosterData"
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /game/news:
+    get:
+      operationId: getNews
+      tags: [game]
+      summary: Get recent news feed
+      responses:
+        "200":
+          description: News items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewsItem"
+
+  /game/rankings:
+    get:
+      operationId: getRankings
+      tags: [game]
+      summary: Get world HLTV-style rankings top 30
+      responses:
+        "200":
+          description: Rankings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RankingEntry"
+
+  /game/transfers:
+    get:
+      operationId: getTransfers
+      tags: [game]
+      summary: Get free agents available to sign
+      responses:
+        "200":
+          description: Free agents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlayerCard"
+
+  /game/fixtures:
+    get:
+      operationId: getFixtures
+      tags: [game]
+      summary: Get upcoming fixtures for player org
+      responses:
+        "200":
+          description: Upcoming fixtures
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Fixture"
+
+  /game/results:
+    get:
+      operationId: getResults
+      tags: [game]
+      summary: Get recent match results for player org
+      responses:
+        "200":
+          description: Recent results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MatchResult"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +264,314 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    NewGameInput:
+      type: object
+      properties:
+        org_id:
+          type: string
+        manager_name:
+          type: string
+        year:
+          type: integer
+      required:
+        - org_id
+        - manager_name
+
+    OrgSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        tag:
+          type: string
+        region:
+          type: string
+        tier:
+          type: integer
+        rating:
+          type: number
+        budget:
+          type: integer
+        roster_size:
+          type: integer
+      required:
+        - id
+        - name
+        - tag
+        - region
+        - tier
+        - rating
+        - budget
+        - roster_size
+
+    GameState:
+      type: object
+      properties:
+        has_game:
+          type: boolean
+        manager_name:
+          type: string
+        week:
+          type: integer
+        month:
+          type: integer
+        year:
+          type: integer
+        season_phase:
+          type: string
+        org_id:
+          type: string
+        org_name:
+          type: string
+        org_tag:
+          type: string
+        region:
+          type: string
+        tier:
+          type: integer
+        budget:
+          type: integer
+        roster_size:
+          type: integer
+        academy_size:
+          type: integer
+        form:
+          type: array
+          items:
+            type: string
+        world_rank:
+          type: ["integer", "null"]
+        chemistry:
+          type: number
+        pressure:
+          type: number
+        news_count:
+          type: integer
+        week_label:
+          type: string
+      required:
+        - has_game
+        - week
+        - month
+        - year
+        - season_phase
+        - budget
+        - roster_size
+        - form
+
+    AdvanceResult:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/GameState"
+        match_results:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchResult"
+        new_news:
+          type: array
+          items:
+            $ref: "#/components/schemas/NewsItem"
+        week_summary:
+          type: string
+      required:
+        - state
+        - match_results
+        - new_news
+        - week_summary
+
+    PlayerCard:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        alias:
+          type: string
+        age:
+          type: integer
+        nationality:
+          type: string
+        role:
+          type: string
+        rating:
+          type: number
+        hltv_rating:
+          type: number
+        salary:
+          type: integer
+        contract_years:
+          type: integer
+        form:
+          type: array
+          items:
+            type: string
+        mental:
+          type: string
+        is_academy:
+          type: boolean
+        org_id:
+          type: ["string", "null"]
+        attributes:
+          type: object
+          additionalProperties:
+            type: number
+      required:
+        - id
+        - name
+        - alias
+        - age
+        - nationality
+        - role
+        - rating
+        - hltv_rating
+        - salary
+        - form
+        - mental
+        - is_academy
+
+    RosterData:
+      type: object
+      properties:
+        roster:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlayerCard"
+        academy:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlayerCard"
+        budget:
+          type: integer
+        chemistry:
+          type: number
+        pressure:
+          type: number
+      required:
+        - roster
+        - academy
+        - budget
+        - chemistry
+        - pressure
+
+    NewsItem:
+      type: object
+      properties:
+        id:
+          type: string
+        headline:
+          type: string
+        category:
+          type: string
+        week:
+          type: integer
+        month:
+          type: integer
+        year:
+          type: integer
+        timestamp:
+          type: string
+      required:
+        - id
+        - headline
+        - category
+        - week
+
+    RankingEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        org_id:
+          type: string
+        name:
+          type: string
+        tag:
+          type: string
+        region:
+          type: string
+        points:
+          type: integer
+        is_player_org:
+          type: boolean
+      required:
+        - rank
+        - org_id
+        - name
+        - tag
+        - region
+        - points
+        - is_player_org
+
+    Fixture:
+      type: object
+      properties:
+        tournament_id:
+          type: string
+        tournament_name:
+          type: string
+        opponent_name:
+          type: string
+        opponent_tag:
+          type: string
+        week:
+          type: integer
+        month:
+          type: integer
+        is_home:
+          type: boolean
+        round:
+          type: string
+      required:
+        - tournament_id
+        - tournament_name
+        - opponent_name
+        - opponent_tag
+        - week
+        - month
+        - round
+
+    MatchResult:
+      type: object
+      properties:
+        tournament_name:
+          type: string
+        team_a:
+          type: string
+        team_b:
+          type: string
+        score_a:
+          type: integer
+        score_b:
+          type: integer
+        winner:
+          type: string
+        is_player_match:
+          type: boolean
+        maps:
+          type: array
+          items:
+            type: string
+        week:
+          type: integer
+      required:
+        - tournament_name
+        - team_a
+        - team_b
+        - score_a
+        - score_b
+        - winner
+        - is_player_match
+        - maps
+        - week
