@@ -1,0 +1,1654 @@
+# CS Manager - Master Prompt v4
+## Part I - Core World & Calendar Simulation
+
+Create a fully working Python multi-file console game called:
+
+"CS Manager - Living Esports World Simulation"
+
+This game is inspired by Football Manager and the CS2 professional ecosystem.
+
+The game MUST simulate a living esports world that progresses through a structured calendar year.
+
+The game is NOT a collection of standalone matches.
+
+The core gameplay loop revolves around the passage of time, tournament schedules, team development, and ecosystem evolution.
+
+---
+
+# CALENDAR-BASED WORLD SIMULATION
+
+The game world progresses chronologically.
+
+Time advances through:
+
+- Years
+- Months
+- Weeks
+- Match days
+
+The player does NOT manually choose random matches.
+
+Instead, the game automatically schedules competitions according to the esports calendar.
+
+All systems must operate within this calendar.
+
+Example:
+
+January Week 1
+→ League matches
+→ Training
+→ News
+
+January Week 2
+→ League matches
+→ Tier 2 tournaments
+→ Rankings update
+
+February
+→ Continue season
+
+March
+→ League conclusion
+→ Relegation qualifiers
+→ Major qualification
+
+---
+
+# GLOBAL STRUCTURE
+
+The world consists of four major regions:
+
+1. Europe
+2. Asia
+3. Latin America
+4. Africa/Oceania
+
+Each region contains:
+
+- a large ecosystem of organizations,
+- professional teams,
+- academy teams,
+- lower-division teams.
+
+Each region should contain approximately 50 organizations.
+
+The exact number may vary.
+
+At minimum, the world must contain 128+ organizations globally.
+
+---
+
+# REGIONAL LEAGUES
+
+Regional leagues are the foundation of the competitive calendar.
+
+Three regional league stages occur every year.
+
+These stages determine:
+
+- Major qualification,
+- Regional rankings,
+- Relegation,
+- Promotion,
+- TI points.
+
+Regional leagues are considered Tier 1 competitions.
+
+---
+
+## Regional League Schedule
+
+Winter Regional League:
+- January
+- February
+- March
+
+Spring Regional League:
+- April
+- May
+- June
+
+Summer Regional League:
+- August
+- September
+- October
+
+July is reserved primarily for secondary events.
+
+November contains TI qualification activities.
+
+December contains The International.
+
+---
+
+# REGIONAL LEAGUE FORMAT
+
+Each region hosts its own league.
+
+Each regional league consists of:
+
+16 teams.
+
+These 16 teams are selected based on:
+
+- regional rankings,
+- previous league participation,
+- promotion/relegation system.
+
+Format:
+
+Round Robin.
+
+Each team plays every other team once.
+
+Total matches per team:
+
+15.
+
+Match format:
+
+Best of 3.
+
+Standings determine:
+
+- Major qualification,
+- regional points,
+- relegation positions.
+
+---
+
+# PROMOTION / RELEGATION SYSTEM
+
+At the conclusion of each regional league stage:
+
+The bottom three teams are relegated.
+
+These organizations lose their place in the next regional league cycle.
+
+Promotion occurs through qualifiers.
+
+This system ensures that regional leagues evolve over time and do not feature the exact same teams every stage.
+
+---
+
+# OPEN QUALIFIERS
+
+All organizations within a region that are NOT currently participating in the regional league may enter qualifiers.
+
+Example:
+
+Europe:
+- 50 organizations total.
+- 16 organizations in league.
+- 34 organizations eligible for qualifiers.
+
+Qualifier format may be simplified.
+
+Top three organizations earn promotion into the next regional league.
+
+This creates:
+
+- Cinderella stories,
+- fresh competition,
+- ecosystem mobility.
+
+---
+
+# MAJOR SYSTEM
+
+There are three Majors every year.
+
+Majors are Tier 1 international tournaments.
+
+Schedule:
+
+Major 1:
+After Winter Regional League.
+
+Major 2:
+After Spring Regional League.
+
+Major 3:
+After Summer Regional League.
+
+Major participation is determined by regional performance.
+
+Slot allocation example:
+
+Europe:
+6 slots.
+
+Asia:
+4 slots.
+
+Latin America:
+3 slots.
+
+Africa/Oceania:
+3 slots.
+
+Total:
+16 teams.
+
+Majors provide:
+
+- prize money,
+- Major titles,
+- TI qualification points,
+- significant HLTV ranking value.
+
+Major performance strongly impacts the global ecosystem.
+
+---
+
+# TIER 2 AND TIER 3 TOURNAMENTS
+
+The world must remain active outside major events.
+
+Secondary tournaments are mandatory.
+
+These tournaments should occur:
+
+- during breaks,
+- between major events,
+- during periods where organizations are idle.
+
+Tier 2 tournaments include:
+
+- commercial LAN events,
+- invitational tournaments,
+- online events.
+
+Tier 3 tournaments include:
+
+- developmental competitions,
+- academy events,
+- regional cups.
+
+Priority participation:
+
+Organizations that:
+- failed to qualify for Majors,
+- are not currently scheduled,
+- belong to lower divisions.
+
+These tournaments provide:
+
+- smaller prize pools,
+- limited ranking value,
+- additional match experience.
+
+Tier 2 and Tier 3 tournaments MUST NOT override the importance of Majors.
+
+Their influence on TI qualification should remain minor.
+
+---
+
+# THE INTERNATIONAL (TI)
+
+The International is the most prestigious tournament of the year.
+
+It occurs annually in December.
+
+It concludes the competitive calendar.
+
+It offers the largest prize pool.
+
+Minimum prize pool:
+
+At least 2.5 times larger than a Major prize pool.
+
+---
+
+# TI PARTICIPANTS
+
+Total teams:
+
+20.
+
+Qualification occurs through:
+
+1. Seasonal performance.
+2. Major performance.
+3. TI qualification points.
+
+Most teams receive direct invitations.
+
+Remaining slots are earned through regional qualifiers.
+
+---
+
+# REGIONAL TI QUALIFIERS
+
+Each region hosts a final qualifier.
+
+One team from each region qualifies.
+
+Regions:
+
+- Europe,
+- Asia,
+- Latin America,
+- Africa/Oceania.
+
+Total qualifier slots:
+
+4.
+
+These events represent last-chance opportunities.
+
+---
+
+# TI FORMAT
+
+Stage One:
+
+Swiss System.
+
+All 20 teams begin equally.
+
+Rules:
+
+Three wins:
+advance.
+
+Three losses:
+eliminated.
+
+Teams always face opponents with identical records.
+
+Examples:
+
+1-1 teams play 1-1 teams.
+
+2-2 teams play 2-2 teams.
+
+This structure continues until qualification or elimination.
+
+---
+
+# TI PLAYOFFS
+
+After Swiss Stage:
+
+The remaining teams enter playoffs.
+
+Playoff structure may use:
+
+Single Elimination.
+
+or
+
+Double Elimination.
+
+The structure should be configurable.
+
+Playoffs determine the world champion.
+
+---
+
+# MONTHLY WORLD PROGRESSION
+
+The world advances naturally.
+
+Every month should include:
+
+- scheduled matches,
+- tournament progression,
+- rankings updates,
+- news generation,
+- player development,
+- organizational changes.
+
+The player experiences the passage of an esports year rather than selecting isolated matches.
+
+---
+
+# DESIGN PHILOSOPHY
+
+The match is NOT the primary object of the game.
+
+The calendar is the primary object.
+
+Matches exist within tournaments.
+
+Tournaments exist within seasons.
+
+Seasons exist within the living esports world.
+
+The goal of the simulation is to make the player feel like they are managing an organization throughout years of esports history rather than simply simulating random games.
+
+# 
+## Part II - Organizations, Players & Ecosystem
+
+Create a living esports ecosystem where organizations, players, coaches, academies and sponsors evolve over many years. The player is managing an organization inside this ecosystem, not simply controlling a roster.
+
+All systems described below are mandatory. If implementation complexity is high, simplify formulas but NEVER remove systems.
+
+---
+
+# ORGANIZATION SYSTEM
+
+Organizations are long-term entities that exist independently of players.
+
+Each organization must have:
+
+- Unique name
+- Region
+- Founding year
+- Financial status
+- Reputation level
+- Global prestige
+- Regional prestige
+- Sponsor agreements
+- Trophy cabinet
+- Historical records
+- Main roster
+- Academy roster
+- Coaching staff
+
+Organizations continue existing throughout multiple seasons.
+
+Teams may become stronger, weaker, dominant, or decline over time.
+
+---
+
+# ORGANIZATIONAL LIFE CYCLE
+
+Organizations should naturally evolve through eras.
+
+Possible eras include:
+
+- Emerging Organization
+- Regional Contender
+- International Challenger
+- Golden Era
+- Established Elite
+- Declining Power
+- Rebuilding Phase
+
+Era classification depends on:
+
+- Results
+- Rankings
+- Trophies
+- Stability
+- Longevity
+
+Organizations should develop identities and narratives over many years.
+
+---
+
+# PLAYER SYSTEM
+
+Players are the most important assets within the ecosystem.
+
+Each player must have persistent identity and complete career tracking.
+
+Every player must have:
+
+## Basic Information
+
+- Unique ID
+- Nickname
+- First name
+- Last name
+- Age
+- Nationality
+- Region
+- Preferred language
+- Current organization
+- Current role
+- Starter/Bench/Academy status
+
+---
+
+# PLAYER AGE SYSTEM
+
+Players should age naturally.
+
+Career progression:
+
+14-15:
+Early academy development.
+
+16-19:
+Academy competition eligibility.
+
+18-25:
+Rapid development phase.
+
+26-29:
+Prime years.
+
+30-33:
+Gradual decline begins.
+
+34+:
+Late-career phase.
+
+Retirement probability increases with age.
+
+Retired players should remain in historical records.
+
+---
+
+# PLAYER ROLES
+
+Every player must have a defined role.
+
+Roles include:
+
+- IGL
+- AWPer
+- Entry Fragger
+- Lurker
+- Support
+
+Players may adapt to secondary roles, but every player should have one primary role.
+
+Role compatibility influences team performance.
+
+---
+
+# PLAYER ATTRIBUTES
+
+Core attributes:
+
+- Aim
+- Game Sense
+- Positioning
+- Clutch Ability
+- Leadership
+
+Optional hidden tendencies:
+
+- Aggression
+- Discipline
+- Adaptability
+- Consistency
+
+Attribute values should evolve over time.
+
+Young players improve faster.
+
+Veterans improve slowly and eventually decline.
+
+---
+
+# PLAYER PLAYSTYLE PROFILE
+
+Every player should have strengths and weaknesses.
+
+Examples:
+
+"Excels in aggressive systems."
+
+"Performs poorly in slow tactical structures."
+
+"Thrives under pressure."
+
+"Struggles in Major playoffs."
+
+This affects:
+
+- Team fit
+- Recruitment decisions
+- Tactical compatibility
+
+---
+
+# PLAYER RATINGS
+
+Every official match generates ratings.
+
+Two primary systems must coexist.
+
+---
+
+## HLTV Rating
+
+Represents long-term statistical effectiveness.
+
+Influenced by:
+
+- Kills
+- Deaths
+- ADR
+- Impact
+- Survival
+- Opponent quality
+
+HLTV rating should evolve naturally throughout careers.
+
+---
+
+## Performance Rating
+
+Scale:
+
+0-10.
+
+Represents contextual contribution.
+
+Factors include:
+
+- Clutches
+- Momentum rounds
+- Opening impact
+- High-pressure situations
+- Match importance
+
+A player may have:
+
+HLTV 1.08
+Performance 9.2
+
+if they consistently deliver in decisive moments.
+
+---
+
+# PLAYER MENTAL SYSTEM
+
+Each player has dynamic psychological traits.
+
+Values include:
+
+- Confidence
+- Motivation
+- Tilt Resistance
+- Consistency
+
+These values fluctuate.
+
+Influenced by:
+
+- Results
+- Winning streaks
+- Losing streaks
+- Personal achievements
+- Tournament pressure
+- Contract situations
+
+Mental state affects match outcomes.
+
+---
+
+# TEAM CHEMISTRY SYSTEM
+
+Chemistry exists at both team and player levels.
+
+Range:
+
+0-100.
+
+Chemistry increases through:
+
+- Playing together
+- Long-term stability
+- Shared nationality
+- Shared language
+- Positive results
+
+Chemistry decreases through:
+
+- Roster changes
+- Conflict
+- Extended losing periods
+
+Higher chemistry improves:
+
+- Coordination
+- Clutch success
+- Stability
+- Tactical execution
+
+---
+
+# TEAM IDENTITY SYSTEM
+
+Organizations gradually develop styles.
+
+Possible identities:
+
+- Aggressive
+- Tactical
+- Balanced
+- Disciplined
+- Chaos-oriented
+
+Identity emerges from:
+
+- Coach philosophy
+- Player profiles
+- Historical tendencies
+
+Identity influences performance and recruitment.
+
+---
+
+# COACH SYSTEM
+
+Organizations must employ coaches.
+
+Each coach has:
+
+- Leadership
+- Tactical IQ
+- Mental Coaching
+
+Coaches influence:
+
+- Pressure resistance
+- Team morale
+- Chemistry growth
+- Tactical consistency
+
+Coaches also possess:
+
+- Nationality
+- Age
+- Reputation
+- Career history
+
+---
+
+# ACADEMY SYSTEM
+
+Academies are mandatory.
+
+Every organization may operate an academy roster.
+
+Academy players are:
+
+14-19 years old.
+
+Academy teams participate independently.
+
+---
+
+# ACADEMY ROSTER STRUCTURE
+
+Academy consists of:
+
+- 5 starters
+- Optional substitute
+
+Academy players possess complete data.
+
+No simplified versions.
+
+---
+
+# ACADEMY COMPETITIONS
+
+Academy teams participate in:
+
+- Tier 3 tournaments
+- Youth leagues
+- Development competitions
+- Regional academy events
+
+Academy players accumulate:
+
+- Statistics
+- Ratings
+- Experience
+- Career history
+
+---
+
+# PROMOTION RULES
+
+Academy players NEVER auto-promote.
+
+Promotion decisions belong exclusively to the human player.
+
+Eligible outcomes:
+
+- Promotion to starting roster.
+- Promotion to bench.
+- Remain in academy.
+
+This rule is mandatory.
+
+---
+
+# SPONSOR SYSTEM
+
+Sponsors represent major organizational stakeholders.
+
+Sponsor types include:
+
+- Conservative
+- Ambitious
+- Premium
+- Development-focused
+
+Sponsors provide:
+
+- Budget increases
+- Expectations
+- Reputation impact
+
+Sponsors may renew or terminate agreements.
+
+---
+
+# EXPECTATIONS SYSTEM
+
+Expectations emerge from:
+
+- Sponsor demands
+- Team prestige
+- Rankings
+- Recent results
+
+Examples:
+
+"Reach Major."
+
+"Finish Top 8 regionally."
+
+"Qualify for TI."
+
+Failure increases pressure.
+
+Success boosts morale.
+
+---
+
+# ECONOMY SYSTEM
+
+Organizations maintain finances.
+
+Track:
+
+- Budget
+- Sponsor income
+- Prize winnings
+- Salaries
+- Transfer expenditures
+- Transfer income
+
+Financial instability should have consequences.
+
+---
+
+# CONTRACT SYSTEM
+
+Players sign contracts.
+
+Duration:
+
+1-3 years.
+
+Contracts include:
+
+- Salary
+- Expiration date
+- Current organization
+
+Contracts must expire naturally.
+
+Players nearing expiration may negotiate extensions.
+
+---
+
+# RE-SIGNING SYSTEM
+
+Human-controlled organizations may renew contracts.
+
+Renewal should be available before expiration.
+
+Failure to renew results in:
+
+Free agency.
+
+This system is mandatory.
+
+---
+
+# TRANSFER MARKET
+
+Organizations actively recruit.
+
+Transfer system includes:
+
+- Incoming offers
+- Outgoing offers
+- Free agents
+- Negotiations
+- Dynamic valuations
+
+Transfer activity occurs throughout the year.
+
+Especially during designated transfer windows.
+
+---
+
+# PLAYER MARKET VALUE
+
+Market value changes dynamically.
+
+Influenced by:
+
+- HLTV Rating
+- Performance Rating
+- Age
+- Role scarcity
+- Chemistry reputation
+- Contract duration
+- Achievements
+
+Track both:
+
+Current Value.
+
+Peak Value.
+
+---
+
+# ORGANIZATION AI
+
+AI-controlled organizations should behave rationally.
+
+Examples:
+
+- Replace declining veterans.
+- Pursue promising academy players.
+- Attempt renewals.
+- Recruit role-compatible players.
+- Protect successful cores.
+
+The world should evolve even without player intervention.
+
+---
+
+# ECOSYSTEM PHILOSOPHY
+
+Organizations are not static containers.
+
+Players are not disposable assets.
+
+Coaches are not cosmetic additions.
+
+Academies are not placeholders.
+
+Every entity must have:
+
+- history,
+- evolution,
+- consequences,
+- long-term narratives.
+
+The goal is to create a believable esports ecosystem capable of generating stories across decades of simulation.
+
+#   
+## Part III-A - UI, Dashboards & Match Experience
+
+This section defines how the player interacts with the simulation world.
+
+The game must not only simulate a living esports ecosystem but also present it through clear, structured, and immersive interfaces.
+
+All UI systems must reflect the passage of time, career progression, and ecosystem evolution.
+
+---
+
+# CORE INTERACTION PHILOSOPHY
+
+The player does NOT directly control matches.
+
+Instead, the player:
+
+- manages an organization,
+- observes scheduled events,
+- reacts to outcomes,
+- makes strategic decisions between time periods.
+
+The interface must emphasize:
+
+> Time progression, not isolated actions.
+
+---
+
+# MAIN MENU SYSTEM
+
+The game must include a terminal-based main menu.
+
+It should provide access to:
+
+- Continue Season
+- View Calendar
+- Team Overview
+- Player Overview
+- Transfers
+- Academy
+- Rankings
+- News
+- Career Dashboard
+- Exit Game
+
+The menu must reflect the current in-game date and season phase.
+
+---
+
+# CALENDAR INTERFACE
+
+The calendar is the core navigation system.
+
+It must display:
+
+- current month
+- upcoming tournaments
+- scheduled matches
+- transfer windows
+- Tier 2 / Tier 3 events
+
+Each time step advances the world state.
+
+The calendar is NOT cosmetic.
+
+It drives simulation progression.
+
+---
+
+# MATCH EXPERIENCE SYSTEM
+
+Matches are not manually selected.
+
+They are automatically triggered by the calendar system.
+
+However, the player must be able to:
+
+- simulate match instantly
+- view detailed match simulation
+- review match statistics
+
+---
+
+## MATCH SIMULATION MODES
+
+### 1. Quick Simulation
+
+- instant result
+- minimal output
+- used for fast progression
+
+---
+
+### 2. Detailed Simulation
+
+Provides structured breakdown:
+
+- round progression (simplified)
+- momentum shifts
+- key moments
+- clutch situations
+- comeback probabilities
+
+Output must remain fast and readable.
+
+---
+
+## MATCH DISPLAY STRUCTURE
+
+Each match must show:
+
+### Pre-match:
+
+- teams
+- rankings
+- form
+- key players
+
+---
+
+### Live Simulation Summary:
+
+- rounds won per team
+- key turning points
+- momentum shifts
+
+---
+
+### Post-match:
+
+- final score
+- player stats
+- HLTV ratings
+- performance ratings
+- ranking impact
+
+---
+
+# POST-MATCH SCREEN (CRITICAL FEATURE)
+
+After every match, display:
+
+## TEAM COMPARISON
+
+Side-by-side layout:
+
+- Team A vs Team B
+- roster comparison
+- key stats comparison
+
+---
+
+## PLAYER STATISTICS
+
+Each player must show:
+
+- kills
+- deaths
+- HLTV rating
+- performance rating
+- role impact
+
+Players are sorted by impact.
+
+---
+
+## ADVANCED METRICS
+
+Must include:
+
+- opening kill rate
+- clutch success rate
+- trade efficiency
+- economy impact
+- consistency rating
+
+These can be simplified but MUST exist.
+
+---
+
+## RANKING IMPACT
+
+Display:
+
+- HLTV ranking movement
+- points gained/lost
+- regional ranking impact
+- TI qualification implications
+
+---
+
+# SEASON DASHBOARD
+
+The Season Dashboard is a macro-level overview.
+
+It must include:
+
+- full season timeline
+- regional league progression
+- Major results
+- TI qualification status
+- team form trends
+
+---
+
+## SEASON FLOW VISUALIZATION
+
+The dashboard must clearly show:
+
+- Winter Season
+- Spring Season
+- Summer Season
+- TI Qualification Phase
+- The International
+
+Each phase must show:
+
+- participating teams
+- winners
+- eliminations
+- promotion/relegation results
+
+---
+
+# CAREER DASHBOARD SYSTEM
+
+This is one of the most important UI systems in the game.
+
+It must exist for BOTH:
+
+- players
+- organizations
+
+---
+
+## PLAYER CAREER DASHBOARD
+
+Each player must have a full career timeline:
+
+### Basic Career Data:
+
+- age progression
+- teams played for
+- roles over time
+
+---
+
+### Performance Evolution:
+
+- HLTV rating history
+- performance rating history
+- peak performance seasons
+
+---
+
+### Financial & Market Data:
+
+- transfer value history
+- highest transfer value
+- salary progression (if implemented)
+
+---
+
+### Career Highlights:
+
+- Major wins
+- MVP awards
+- record performances
+- legendary matches
+
+---
+
+## ORGANIZATION CAREER DASHBOARD
+
+Each organization must include:
+
+### Historical Eras:
+
+- rise phase
+- peak phase
+- decline phase
+- rebuild phase
+
+---
+
+### Competitive History:
+
+- regional titles
+- Major results
+- The International results
+
+---
+
+### Roster Evolution:
+
+- full roster history
+- key player eras
+- academy promotions that succeeded
+
+---
+
+### Ranking History:
+
+- HLTV ranking progression over time
+- peak ranking position
+- consistency metrics
+
+---
+
+# NEWS SYSTEM INTERFACE
+
+The game must generate dynamic news events.
+
+News must appear in:
+
+- main menu
+- calendar updates
+- post-match screen
+
+---
+
+## NEWS CATEGORIES
+
+- transfers
+- upsets
+- roster changes
+- injuries (optional simplified system)
+- winning streaks
+- records
+- tournament results
+
+---
+
+## NEWS STYLE
+
+News must feel like esports media coverage:
+
+- short headlines
+- structured updates
+- timestamped events
+
+Example:
+
+"Team Aurora shocks top seed in Major opener"
+
+---
+
+# STATISTICS & RECORD SYSTEM
+
+The game must track global records:
+
+## PLAYER RECORDS
+
+- highest HLTV rating in a season
+- most MVP awards
+- most kills in a match
+- longest career peak duration
+
+---
+
+## TEAM RECORDS
+
+- longest winning streak
+- most trophies in a year
+- highest HLTV ranking achieved
+- most dominant Major run
+
+---
+
+These records must update dynamically.
+
+---
+
+# UI DESIGN PRINCIPLE
+
+The UI is NOT decorative.
+
+It must:
+
+- reflect time progression
+- show consequences of decisions
+- highlight career evolution
+- display ecosystem changes
+
+---
+
+# TECHNICAL REQUIREMENTS (UI LAYER)
+
+All UI must:
+
+- run in terminal
+- use structured text layouts
+- avoid external dependencies
+- remain readable under fast simulation
+
+---
+
+# FINAL UI PHILOSOPHY
+
+The player should feel like:
+
+> an esports organization manager observing a living, evolving competitive world
+
+NOT like:
+
+> someone clicking through isolated match simulations
+
+
+## Part III-B - Technical Requirements & Replit Execution Rules
+
+This section defines strict technical constraints, architecture rules, and execution guarantees.
+
+Its purpose is to ensure the generated project is:
+
+- fully runnable,
+- structurally correct,
+- system-complete,
+- resistant to simplification or feature loss.
+
+---
+
+# 🚨 CRITICAL EXECUTION RULE
+
+This is NOT a suggestion-based prompt.
+
+It is a strict system specification.
+
+If any requirement conflicts with simplicity:
+
+> SYSTEM COMPLETENESS ALWAYS WINS.
+
+---
+
+# PROJECT ARCHITECTURE REQUIREMENTS
+
+The project MUST be generated as a multi-file Python application.
+
+## REQUIRED STRUCTURE
+
+text id="csm-arch-01" cs_manager/ │ ├── main.py ├── game_loop.py ├── config.py │ ├── data/ │   ├── players.json │   ├── teams.json │   ├── tournaments.json │   ├── economy.json │   ├── rankings.json │   ├── contracts.json │   ├── news.json │ ├── engine/ │   ├── match_engine.py │   ├── simulation_engine.py │   ├── calendar_engine.py │   ├── ranking_engine.py │   ├── economy_engine.py │   ├── transfer_engine.py │ ├── systems/ │   ├── player_system.py │   ├── team_system.py │   ├── chemistry_system.py │   ├── pressure_system.py │   ├── contract_system.py │   ├── academy_system.py │   ├── tournament_system.py │   ├── news_system.py │ ├── ui/ │   ├── menu.py │   ├── calendar_view.py │   ├── match_view.py │   ├── season_dashboard.py │   ├── career_dashboard.py │ └── utils/     ├── random_utils.py     ├── time_utils.py     ├── stats_utils.py 
+
+---
+
+# 🧠 CALENDAR-FIRST ARCHITECTURE RULE
+
+The most important structural rule:
+
+> The game MUST be driven by calendar progression, NOT by isolated match calls.
+
+## REQUIRED FLOW:
+
+text id="calendar-flow-01" advance_time() → check_calendar_events() → trigger_tournaments() → simulate_matches() → update_ranking() → update_economy() → update_player_states() → generate_news() 
+
+---
+
+# 🚨 MATCH SYSTEM INTEGRATION RULE
+
+Matches MUST NEVER exist as standalone user-triggered actions.
+
+Matches can ONLY be triggered by:
+
+- calendar events
+- tournament schedules
+- league fixtures
+
+Any function allowing free match simulation MUST be removed or converted into:
+
+> "simulation replay mode"
+
+---
+
+# 💾 DATA PERSISTENCE RULE
+
+All persistent data MUST use JSON files.
+
+## Required persisted entities:
+
+- Players
+- Teams
+- Tournaments
+- Match history
+- Rankings (HLTV system)
+- Economy state
+- Contracts
+- News system
+
+Each system MUST read and write its own state.
+
+---
+
+# 🧠 SYSTEM INTEGRATION RULE
+
+All systems must be interconnected.
+
+## REQUIRED DEPENDENCIES:
+
+- Player system depends on:
+  - chemistry system
+  - pressure system
+  - contract system
+
+- Match engine depends on:
+  - player attributes
+  - team chemistry
+  - ranking system
+  - pressure system
+
+- Ranking system depends on:
+  - match results
+  - tournament importance
+  - time decay model
+
+- Economy depends on:
+  - sponsor system
+  - tournament results
+  - team ranking
+
+---
+
+# 🚨 NO-ISOLATION RULE
+
+No system is allowed to exist in isolation.
+
+If a system exists but is not connected to:
+
+- match simulation
+- calendar progression
+- ranking system
+
+→ it is considered INVALID.
+
+---
+
+# 🧠 SIMPLIFICATION POLICY
+
+Simplification is allowed ONLY for:
+
+- formulas
+- calculations
+- probability models
+
+Simplification is NOT allowed for:
+
+- system removal
+- system merging
+- system omission
+- feature skipping
+
+If a system is too complex:
+
+> implement a simplified version of the SAME system
+
+NOT a replacement.
+
+---
+
+# ⏱ CALENDAR ENGINE REQUIREMENTS
+
+The calendar engine MUST support:
+
+- year progression
+- monthly cycles
+- weekly scheduling
+- tournament scheduling
+- regional league cycles
+
+## REQUIRED EVENTS:
+
+- Regional League Cycle 1
+- Regional League Cycle 2
+- Regional League Cycle 3
+- Major 1
+- Major 2
+- Major 3
+- TI qualification phase
+- The International
+- Tier 2 / Tier 3 tournaments (interleaved)
+
+---
+
+# 🏆 RANKING ENGINE REQUIREMENTS
+
+Must implement:
+
+## HLTV WORLD RANKING (TOP 50)
+
+- updated monthly
+- based on last 2–3 months performance
+- includes decay system
+
+Ranking influences:
+
+- tournament invites
+- sponsorships
+- reputation
+- TI qualification
+
+---
+
+# 🧠 FAILURE RESISTANCE RULE
+
+If a system cannot be fully implemented:
+
+YOU MUST:
+
+1. Create minimal working version
+2. Ensure system still exists in architecture
+3. Ensure system affects at least one other system
+4. Mark it internally as "simplified implementation"
+
+DO NOT delete it.
+
+---
+
+# 🎮 GAME LOOP REQUIREMENT
+
+The main loop MUST follow:
+
+text id="game-loop-01" while game_running:     advance_calendar()     process_tournaments()     simulate_matches()     update_players()     update_teams()     update_rankings()     update_economy()     generate_news()     save_state() 
+
+---
+
+# 🚫 FORBIDDEN ACTIONS
+
+The generated code MUST NOT:
+
+- remove systems due to complexity
+- flatten architecture into a single file
+- skip calendar logic
+- allow free match simulation as core gameplay
+- ignore academy system
+- ignore promotion/relegation system
+- ignore contracts system
+- ignore economy system
+
+---
+
+# 🧠 FINAL SYSTEM GUARANTEE
+
+The final generated project MUST contain:
+
+- calendar-driven world simulation
+- tournament ecosystem (regional + majors + TI)
+- player lifecycle system
+- academy system
+- economy + sponsors
+- contracts + transfers
+- HLTV ranking system
+- chemistry + pressure systems
+- career tracking system
+- news system
+- full UI dashboards
+
+---
+
+# 🏁 FINAL GOAL
+
+The result must be:
+
+> A living esports world simulation engine where time drives everything and all systems evolve continuously.
+
+NOT a menu game.
+
+A complete dynamic esports manager simulator with esport ecosystem 
+
+---
+
+NOW GENERATE THE FULL WORKING PYTHON PROJECT.
