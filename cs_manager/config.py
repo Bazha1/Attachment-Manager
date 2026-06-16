@@ -59,6 +59,24 @@ MAJORS = [
     {"name": "Major 3", "after_phase": "summer", "month": 11, "week": 1},
 ]
 
+# ─── Season Pipeline ───────────────────────────────────────────────────────
+# Season performance points for qualification tracking
+SEASON_LEAGUE_POINTS = [100, 80, 65, 50, 40, 35, 30, 25, 20, 18, 16, 14, 12, 10, 8, 5]
+SEASON_PLAYOFF_POINTS = [150, 120, 90, 60, 40, 40, 20, 20]
+SEASON_MAJOR_POINTS = [500, 400, 300, 200, 100, 100, 100, 100, 50, 50, 50, 50, 50, 50, 50, 50]
+SEASON_TI_POINTS = [1000, 800, 600, 400, 200, 200, 200, 200, 100, 100, 100, 100, 100, 100, 100, 100,
+                    50, 50, 50, 50]
+
+# Regional playoff size (top N from league advance to playoff)
+REGIONAL_PLAYOFF_SIZE = 8
+
+# Combined season cycle definition
+SEASON_CYCLES = {
+    "cycle_1": {"league": "winter", "major": "Major 1", "major_month": 4, "major_week": 1},
+    "cycle_2": {"league": "spring", "major": "Major 2", "major_month": 7, "major_week": 2},
+    "cycle_3": {"league": "summer", "major": "Major 3", "major_month": 11, "major_week": 1},
+}
+
 # ─── Player Roles ────────────────────────────────────────────────────────────
 ROLES = ["IGL", "AWPer", "Entry Fragger", "Lurker", "Support"]
 ROLE_WEIGHTS = [1, 1, 2, 1, 2]  # relative frequency

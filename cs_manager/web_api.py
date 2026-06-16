@@ -191,6 +191,17 @@ def build_game_state(gs):
     }
     season_phase = phase_map.get(month, "Off-Season")
 
+    # Season progress (use current_season, not calendar year)
+    season_info = None
+    try:
+        from engine.season_engine import get_season_progress, get_org_season_performance
+        season_info = get_season_progress(gs, None)
+        player_season = get_org_season_performance(gs, org_id, None)
+        if season_info:
+            season_info["player_points"] = player_season
+    except Exception:
+        pass
+
     return {
         "has_game":      True,
         "manager_name":  gs.get("player_name", "Manager"),
@@ -212,6 +223,7 @@ def build_game_state(gs):
         "pressure":      pres,
         "news_count":    len(gs.get("news", [])),
         "week_label":    week_label,
+        "season":        season_info,
     }
 
 
@@ -252,7 +264,7 @@ def handle_get_state():
     if gs is None:
         return {"has_game": False, "week": 0, "month": 1, "year": 2025,
                 "season_phase": "", "budget": 0, "roster_size": 0,
-                "academy_size": 0, "form": []}
+                "academy_size": 0, "form": [], "season": None}
     return build_game_state(gs)
 
 
@@ -839,6 +851,41 @@ def handle_get_calendar():
                 "winner": t.get("winner"),
             })
 
+    # Season progress
+    season_data = None
+    try:
+        from engine.season_engine import get_season_progress
+        season_data = get_season_progress(gs, None)
+    except Exception:
+        pass
+
+    # Pipeline stage info
+    pipeline_stage = None
+    try:
+        from engine.season_engine import get_current_cycle
+        cid, cycle = get_current_cycle(gs)
+        if cycle:
+            league_status = "upcoming"
+            if cycle.get("league") and isinstance(cycle["league"], dict):
+                league_status = "completed" if all(
+                    l.get("status") == "completed" for l in cycle["league"].values()
+                ) else "ongoing"
+            pipeline_stage = {
+                "cycle": cid,
+                "cycle_status": cycle["status"],
+                "league_status": league_status,
+                "playoff_status": "upcoming",
+                "major_status": "upcoming",
+            }
+            if cycle.get("playoffs"):
+                pipeline_stage["playoff_status"] = "completed" if all(
+                    p.get("status") == "completed" for p in cycle["playoffs"].values()
+                ) else "ongoing"
+            if cycle.get("major") and isinstance(cycle["major"], dict):
+                pipeline_stage["major_status"] = cycle["major"].get("status", "upcoming")
+    except Exception:
+        pass
+
     return {
         "current_phase":       phase_label,
         "phase_key":           phase,
@@ -848,6 +895,8 @@ def handle_get_calendar():
         "active_tournaments":  active_tournaments[:5],
         "week_label":          gs.get("current_date",
                                       f"Week {week}, {year}"),
+        "season":              season_data,
+        "pipeline_stage":      pipeline_stage,
     }
 
 

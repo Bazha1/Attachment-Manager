@@ -7,7 +7,8 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import (SEASON_PHASES, LEAGUE_SIZE, REGIONS, MAJORS,
                     MAJOR_SLOTS_BY_REGION, TI_TOTAL_TEAMS, TI_QUALIFIER_SLOTS,
-                    MAJOR_PRIZE_POOL, TI_PRIZE_POOL, MAJOR_TOTAL_TEAMS)
+                    MAJOR_PRIZE_POOL, TI_PRIZE_POOL, MAJOR_TOTAL_TEAMS,
+                    SEASON_CYCLES)
 from utils.time_utils import (advance_week, is_league_month,
                                league_round_for_week, phase_for_month, date_str)
 from systems.tournament_system import (
@@ -18,6 +19,11 @@ from systems.tournament_system import (
 from engine.match_engine import simulate_match
 from engine.ranking_engine import update_ranking_points, update_org_ranking_points
 from engine.economy_engine import apply_monthly_financials, prize_distribution, renew_sponsor
+from engine.season_engine import (
+    init_season_state, record_league_result, record_playoff_result,
+    record_major_result, record_ti_qual_result, record_ti_result,
+    get_season, get_season_progress
+)
 from systems.team_system import record_result, update_reputation, update_era, reset_season
 from systems.news_system import (news_tournament_winner, news_match_upset,
                                  news_relegation, news_promotion, news_major_qualified)
@@ -32,17 +38,26 @@ def advance_time(gs: dict) -> list:
     """
     events_log = []
 
-    # 1. Advance calendar
+    # 1. Ensure season state exists
+    y = gs.get("year", 2025)
+    if not gs.get("seasons"):
+        init_season_state(gs, y)
+        gs["current_season"] = y
+    # If year changed and current season isn't complete, keep current_season
+    # pointing to the active season year. This prevents season data from
+    # resetting when the calendar rolls into January.
+
+    # 2. Advance calendar
     gs["year"], gs["month"], gs["week"] = advance_week(
         gs["year"], gs["month"], gs["week"])
 
     y, m, w = gs["year"], gs["month"], gs["week"]
     gs["current_date"] = date_str(y, m, w)
 
-    # 2. Check and trigger scheduled events
+    # 3. Check and trigger scheduled events
     events_log += _check_calendar_events(gs)
 
-    # 3. Monthly tasks (first week of each month)
+    # 4. Monthly tasks (first week of each month)
     if w == 1:
         _monthly_tasks(gs)
 
@@ -77,24 +92,66 @@ def _check_calendar_events(gs: dict) -> list:
                 if tourn and tourn["status"] == "ongoing":
                     log += _finalise_league(gs, tourn, region)
 
-    # ── Majors ────────────────────────────────────────────────────────────
+    # ── Regional Playoffs (auto-created by season pipeline after league) ──
+    for tourn in list(gs["tournaments"].values()):
+        if tourn.get("type") == "tier2" and "Playoffs" in tourn.get("name", ""):
+            if tourn["status"] == "ongoing":
+                log += _run_se_tournament(gs, tourn)
+
+    # ── Majors (auto-created by season pipeline after playoffs) ────────────
+    for tourn in list(gs["tournaments"].values()):
+        if tourn.get("type") == "major" and tourn["status"] == "ongoing":
+            log += _run_se_tournament(gs, tourn)
+
+    # ── Legacy: create majors from schedule if pipeline hasn't created them ──
     for major_def in MAJORS:
         if m == major_def["month"] and w == major_def["week"]:
-            key = f"major_{major_def['name'].replace(' ','_')}_{y}"
-            if key not in gs["tournaments"]:
-                tourn = _create_major(gs, major_def, y)
-                if tourn:
-                    gs["tournaments"][key] = tourn
-                    log += _run_se_tournament(gs, tourn)
+            # Check if pipeline already created this major
+            pipeline_major = None
+            for t in gs["tournaments"].values():
+                if t.get("type") == "major" and str(y) in t.get("name", ""):
+                    pipeline_major = t
+                    break
+            if pipeline_major:
+                log += _run_se_tournament(gs, pipeline_major)
+            else:
+                key = f"major_{major_def['name'].replace(' ','_')}_{y}"
+                if key not in gs["tournaments"]:
+                    tourn = _create_major(gs, major_def, y)
+                    if tourn:
+                        gs["tournaments"][key] = tourn
+                        log += _run_se_tournament(gs, tourn)
 
-    # ── TI Qualification (Nov W1) ─────────────────────────────────────────
-    if m == 11 and w == 1:
+    # ── TI Qualifiers (auto-created by season pipeline after all cycles) ──
+    for tourn in list(gs["tournaments"].values()):
+        if tourn.get("type") == "tier2" and "Qualifier" in tourn.get("name", ""):
+            if tourn["status"] == "ongoing":
+                log += _run_se_tournament(gs, tourn)
+
+    # ── Legacy TI Qualification (Nov W1) ──────────────────────────────────
+    qual_exists = any(
+        t.get("type") == "tier2" and "Qualifier" in t.get("name", "")
+        for t in gs["tournaments"].values()
+    )
+    if m == 11 and w == 1 and not qual_exists:
         key = f"ti_qual_{y}"
         if key not in gs["tournaments"]:
             log += _run_ti_qualifiers(gs, y)
 
-    # ── The International (Dec W2) ────────────────────────────────────────
-    if m == 12 and w == 2:
+    # ── The International (auto-created by season pipeline after qualifiers) ─
+    for tourn in list(gs["tournaments"].values()):
+        if tourn.get("type") == "ti" and tourn["status"] == "ongoing":
+            if "Playoffs" in tourn.get("name", ""):
+                log += _run_se_tournament(gs, tourn)
+            else:
+                log += _run_ti_swiss(gs, tourn)
+
+    # ── Legacy: The International (Dec W2) ───────────────────────────────
+    ti_exists = any(
+        t.get("type") == "ti" and not "Playoffs" in t.get("name", "")
+        for t in gs["tournaments"].values()
+    )
+    if m == 12 and w == 2 and not ti_exists:
         key = f"ti_{y}"
         if key not in gs["tournaments"]:
             log += _run_ti(gs, y)
@@ -239,6 +296,11 @@ def _finalise_league(gs: dict, tourn: dict, region: str) -> list:
             reset_season(org)
     log.append({"type": "league_end", "tournament": tourn["name"],
                 "standings": standings[:5]})
+
+    # Season pipeline: record league result and trigger next stage
+    pipeline_log = record_league_result(gs, tourn)
+    log.extend(pipeline_log)
+
     return log
 
 
@@ -302,10 +364,14 @@ def _run_se_tournament(gs: dict, tourn: dict) -> list:
             m["score"]  = result["score"]
             w_org = gs["orgs"][result["winner"]]
             l_org = gs["orgs"][result["loser"]]
+            # Store scores from each org's perspective
+            score_parts = result["score"].split("-")
+            w_score = score_parts[0]
+            l_score = score_parts[1] if len(score_parts) > 1 else "0"
             record_result(w_org, "W", l_org["name"],
-                          result["score"], gs["year"], gs["month"])
+                          f"{w_score}-{l_score}", gs["year"], gs["month"])
             record_result(l_org, "L", w_org["name"],
-                          result["score"], gs["year"], gs["month"])
+                          f"{l_score}-{w_score}", gs["year"], gs["month"])
             pts_table = {
                 "ti": (2000, 300), "major": (1200, 200), "tier2": (150, 30)
             }.get(tourn["type"], (50, 10))
@@ -328,6 +394,18 @@ def _run_se_tournament(gs: dict, tourn: dict) -> list:
     finished = [m["loser"] for m in tourn["bracket"] if m.get("played") and m.get("loser")]
     standings = [tourn["winner"]] + list(reversed(finished)) if tourn.get("winner") else []
     prize_distribution(tourn, standings, gs["orgs"])
+
+    # Season pipeline: record tournament completion
+    if tourn["type"] == "major" and tourn["status"] == "completed":
+        pipeline_log = record_major_result(gs, tourn)
+        log.extend(pipeline_log)
+    elif tourn["type"] == "tier2" and "Qualifier" in tourn.get("name", ""):
+        pipeline_log = record_ti_qual_result(gs, tourn)
+        log.extend(pipeline_log)
+    elif tourn["type"] == "tier2" and "Playoffs" in tourn.get("name", ""):
+        pipeline_log = record_playoff_result(gs, tourn)
+        log.extend(pipeline_log)
+
     return log
 
 
@@ -367,20 +445,17 @@ def _run_ti_qualifiers(gs: dict, year: int) -> list:
     return log
 
 
-# ─── The International ────────────────────────────────────────────────────
+# ─── The International ───────────────────────────────────
 
-def _run_ti(gs: dict, year: int) -> list:
+def _run_ti_swiss(gs: dict, tourn: dict) -> list:
+    """Run Swiss stage for TI. Returns updated log."""
     log = []
-    qualified = gs.get("ti_qualified", [])[:TI_TOTAL_TEAMS]
-    if len(qualified) < 4:
+    year = tourn["year"]
+    if tourn.get("swiss_init"):
         return log
-    # Swiss stage
-    tourn = create_tournament(
-        f"The International {year}", "ti", "1", None,
-        year, 12, qualified, prize_pool=TI_PRIZE_POOL
-    )
     init_swiss(tourn)
-    for _ in range(8):  # max 8 swiss rounds
+    tourn["swiss_init"] = True
+    for _ in range(8):
         pools = get_swiss_pools(tourn)
         if not pools:
             break
@@ -405,8 +480,7 @@ def _run_ti(gs: dict, year: int) -> list:
             result["tournament_name"] = tourn["name"]
             log.append(result)
         tourn["current_round"] += 1
-    # Playoffs from advanced teams
-    playoff_teams = tourn["swiss_advanced"]
+    playoff_teams = tourn.get("swiss_advanced", [])
     if len(playoff_teams) >= 2:
         playoff = create_tournament(
             f"TI {year} Playoffs", "ti", "1", None,
@@ -415,26 +489,40 @@ def _run_ti(gs: dict, year: int) -> list:
         playoff["bracket"] = generate_se_bracket(playoff_teams)
         playoff["current_round"] = 1
         playoff["status"] = "ongoing"
-        log += _run_se_tournament(gs, playoff)
         gs["tournaments"][f"ti_{year}_playoffs"] = playoff
+    return log
+
+
+def _run_ti(gs: dict, year: int) -> list:
+    """Legacy full TI run."""
+    log = []
+    qualified = gs.get("ti_qualified", [])[:TI_TOTAL_TEAMS]
+    if len(qualified) < 4:
+        return log
+    tourn = create_tournament(
+        f"The International {year}", "ti", "1", None,
+        year, 12, qualified, prize_pool=TI_PRIZE_POOL
+    )
+    log += _run_ti_swiss(gs, tourn)
+    gs["tournaments"][f"ti_{year}"] = tourn
+    playoff = gs["tournaments"].get(f"ti_{year}_playoffs")
+    if playoff and playoff["status"] == "ongoing":
+        log += _run_se_tournament(gs, playoff)
         winner_id = playoff.get("winner")
     else:
-        winner_id = playoff_teams[0] if playoff_teams else None
-
+        winner_id = None
     if winner_id:
         w_org = gs["orgs"].get(winner_id)
         if w_org:
             w_org["trophies"].append({"name": f"The International {year}", "year": year})
             news_tournament_winner(gs, w_org["name"], f"The International {year}")
         tourn["winner"] = winner_id
-    gs["tournaments"][f"ti_{year}"] = tourn
-    # Distribute TI prizes
+    record_ti_result(gs, tourn)
     all_teams = (tourn.get("swiss_advanced", []) +
                  list(reversed(tourn.get("swiss_eliminated", []))))
     standings = [winner_id] + [t for t in all_teams if t != winner_id] if winner_id else all_teams
     prize_distribution(tourn, standings, gs["orgs"])
     return log
-
 
 # ─── Tier 2 Filler Events ─────────────────────────────────────────────────
 

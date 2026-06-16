@@ -19,6 +19,14 @@ def simulate_world_week(gs: dict) -> None:
     The calendar engine handles match/tournament triggers;
     this function handles everything else.
     """
+    # Ensure season state exists
+    year = gs.get("year", 2025)
+    from engine.season_engine import init_season_state
+    if not gs.get("seasons"):
+        init_season_state(gs, year)
+        gs["current_season"] = year
+    # Don't overwrite current_season when the calendar year advances to a new year
+    # The active season spans across the calendar year boundary
     # 1. Player development (once per month — on week 1)
     if gs["week"] == 1:
         _develop_all_players(gs)

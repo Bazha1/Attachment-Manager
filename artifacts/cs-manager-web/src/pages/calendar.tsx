@@ -184,6 +184,82 @@ export default function CalendarPage() {
         </div>
       )}
 
+      {/* Pipeline stage */}
+      {cal?.pipeline_stage && (
+        <div className="stat-card">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            Tournament Pipeline
+          </div>
+          <div className="flex items-center gap-1 text-xs">
+            {[
+              { label: "League", status: cal.pipeline_stage.league_status },
+              { label: "Playoffs", status: cal.pipeline_stage.playoff_status },
+              { label: "Major", status: cal.pipeline_stage.major_status },
+            ].map((stage, i) => (
+              <span key={i} className="flex items-center gap-1">
+                <span
+                  className={`px-2 py-0.5 rounded font-medium ${
+                    stage.status === "completed"
+                      ? "bg-green-500/20 text-green-400"
+                      : stage.status === "ongoing"
+                      ? "bg-primary/20 text-primary"
+                      : "bg-secondary text-muted-foreground"
+                  }`}
+                >
+                  {stage.label}
+                </span>
+                {i < 2 && <span className="text-muted-foreground">→</span>}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Season overall progress */}
+      {cal?.season && (
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              Season {cal.season.year}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {cal.season.cycles_completed}/{cal.season.cycles_total} cycles
+            </span>
+          </div>
+          <ProgressBar
+            value={(cal.season.cycles_completed || 0) / (cal.season.cycles_total || 3)}
+          />
+          {cal.season.ti_qual_status && (
+            <div className="flex items-center gap-2 mt-2 text-xs">
+              <span className="text-muted-foreground">TI Qual:</span>
+              <span
+                className={`font-medium ${
+                  cal.season.ti_qual_status === "completed"
+                    ? "text-green-400"
+                    : cal.season.ti_qual_status === "ongoing"
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {cal.season.ti_qual_status}
+              </span>
+              <span className="text-muted-foreground">· TI:</span>
+              <span
+                className={`font-medium ${
+                  cal.season.ti_status === "completed"
+                    ? "text-green-400"
+                    : cal.season.ti_status === "ongoing"
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {cal.season.ti_status}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Advancing spinner */}
       {advance.isPending && (
         <div className="stat-card text-center py-6">

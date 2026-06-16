@@ -94,6 +94,37 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Season progress */}
+      {state.season && (
+        <div className="stat-card">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              {state.season.current_phase}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {state.season.cycles_completed}/{state.season.cycles_total} cycles
+            </span>
+          </div>
+          <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all"
+              style={{
+                width: `${Math.round(((state.season.cycles_completed || 0) / (state.season.cycles_total || 3)) * 100)}%`,
+              }}
+            />
+          </div>
+          {state.season.player_points && (
+            <div className="flex items-center gap-3 mt-2 text-xs">
+              <span className="text-muted-foreground">Season Points:</span>
+              <span className="font-bold text-primary">{state.season.player_points.total}</span>
+              <span className="text-muted-foreground">
+                L:{state.season.player_points.league} P:{state.season.player_points.playoff} M:{state.season.player_points.major} TI:{state.season.player_points.ti}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-3">
         <StatBlock
