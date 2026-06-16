@@ -900,6 +900,14 @@ def handle_get_calendar():
     }
 
 
+def handle_delete_game():
+    """Delete the current save file to start fresh."""
+    import os
+    if os.path.exists(STATE_FILE):
+        os.remove(STATE_FILE)
+    return {"deleted": True}
+
+
 def handle_list_orgs_initial():
     """Generate a mini world just for org selection."""
     from main import generate_world
@@ -974,6 +982,9 @@ def main():
 
         elif action == "get_calendar":
             result = handle_get_calendar()
+
+        elif action == "delete_game":
+            result = handle_delete_game()
 
         else:
             result = {"error": f"Unknown action: {action}"}

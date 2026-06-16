@@ -95,5 +95,7 @@ router.get("/game/calendar",
   gameRoute("get_calendar"));
 router.post("/game/transfers/buy/:playerId",
   gameRoute("transfer_player", (req) => ({ player_id: req.params.playerId })));
+router.post("/game/delete",
+  gameRoute("delete_game"));
 
 export default router;
