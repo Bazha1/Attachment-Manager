@@ -361,6 +361,7 @@ def _run_se_tournament(gs: dict, tourn: dict) -> list:
                                     year=gs["year"], month=gs["month"])
             m["played"] = True
             m["winner"] = result["winner"]
+            m["loser"]  = result["loser"]
             m["score"]  = result["score"]
             w_org = gs["orgs"][result["winner"]]
             l_org = gs["orgs"][result["loser"]]
@@ -405,6 +406,14 @@ def _run_se_tournament(gs: dict, tourn: dict) -> list:
     elif tourn["type"] == "tier2" and "Playoffs" in tourn.get("name", ""):
         pipeline_log = record_playoff_result(gs, tourn)
         log.extend(pipeline_log)
+    elif tourn["type"] == "ti" and "Playoffs" in tourn.get("name", "") and tourn["status"] == "completed":
+        # TI playoff finished — record final TI result and mark main TI as completed
+        record_ti_result(gs, tourn)
+        # The main TI tournament is stored separately; mark it completed too
+        for main_t in gs["tournaments"].values():
+            if main_t.get("type") == "ti" and not "Playoffs" in main_t.get("name", ""):
+                main_t["status"] = "completed"
+        log.append({"type": "ti_completed", "tournament": tourn["name"]})
 
     return log
 

@@ -439,6 +439,8 @@ def record_ti_qual_result(gs: dict, tournament: dict) -> list:
     qual_tourns = [t for t in gs["tournaments"].values()
                    if t.get("name", "").startswith(f"TI {year}") and "Qualifier" in t.get("name", "")]
     if all(t.get("status") == "completed" for t in qual_tourns):
+        # Mark TI qualification as completed
+        season["ti_qual"]["status"] = "completed"
         # Trigger TI — only if not already created
         ti_exists = any(
             t.get("type") == "ti" and not "Playoffs" in t.get("name", "")
@@ -470,6 +472,7 @@ def create_ti_from_qual(gs: dict, year: int) -> dict | None:
         f"The International {year}", "ti", "1", None,
         year, 12, qualified, prize_pool=TI_PRIZE_POOL
     )
+    tourn["status"] = "ongoing"
     return tourn
 
 
@@ -480,6 +483,7 @@ def record_ti_result(gs: dict, tournament: dict) -> None:
     if not season:
         return
 
+    tournament["status"] = "completed"
     season["ti"]["status"] = "completed"
     season["ti"]["standings"] = _extract_se_standings(tournament)
 

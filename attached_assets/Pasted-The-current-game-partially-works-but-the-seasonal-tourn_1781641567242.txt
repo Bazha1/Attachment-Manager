@@ -1,0 +1,175 @@
+The current game partially works, but the seasonal tournament progression is still broken. Do NOT rewrite the entire game. Fix and extend the existing systems while preserving all current functionality.
+
+CRITICAL GOAL:
+The game must simulate a complete competitive year automatically, with proper progression from Regional Leagues to Majors and finally The International.
+
+====================================================
+SEASON STRUCTURE
+====================================================
+
+Implement the following annual structure:
+
+CYCLE 1
+- January-March:
+  Regional Leagues
+  Regional Playoffs
+- April:
+  Major #1
+
+CYCLE 2
+- May-July:
+  Regional Leagues
+  Regional Playoffs
+- August:
+  Major #2
+
+CYCLE 3
+- September-October:
+  Regional Leagues
+  Regional Playoffs
+- November:
+  Major #3
+
+END OF YEAR
+- Determine The International participants
+- Run The International
+- Show season summary
+- Start a new calendar year
+
+====================================================
+REGIONAL LEAGUES
+====================================================
+
+There are 4 regions:
+
+- Europe
+- Asia
+- Americas
+- Africa/Oceania
+
+Each Regional League contains exactly 16 teams.
+
+Regional League requirements:
+
+- Use a true Round Robin format.
+- Every team must play every other team exactly once.
+- All matches are Best of 3.
+- Each team therefore plays exactly 15 league matches.
+- The league table must update after every match.
+
+Display:
+
+- wins
+- losses
+- map differential (if available)
+- league position
+
+The player-controlled team must participate normally.
+
+====================================================
+REGIONAL PLAYOFFS
+====================================================
+
+After each Regional League finishes:
+
+- Generate Regional Playoffs.
+- Use league standings to seed the playoffs.
+- Determine the teams that qualify for the Major.
+
+Playoffs should influence qualification and seasonal performance.
+
+====================================================
+MAJORS
+====================================================
+
+After ALL four regional playoffs are completed:
+
+Automatically create a Major.
+
+Major slots:
+
+- Europe: 6 teams
+- Asia: 4 teams
+- Americas: 3 teams
+- Africa/Oceania: 3 teams
+
+Major requirements:
+
+- Run as a complete tournament.
+- Simulate all matches.
+- Update player statistics.
+- Update HLTV rankings.
+- Award TI Points.
+
+The player team must participate if qualified.
+
+====================================================
+TI POINTS SYSTEM
+====================================================
+
+Create a separate TI Points ranking.
+
+This is NOT the HLTV ranking.
+
+Award TI Points based on:
+
+- Regional League performance
+- Regional Playoff performance
+- Major performance
+
+Store TI Points throughout the entire season.
+
+====================================================
+THE INTERNATIONAL
+====================================================
+
+At the end of the third cycle:
+
+Determine The International participants.
+
+Qualification:
+
+- 16 teams qualify directly through TI Points.
+- 4 teams qualify through Regional Qualifiers.
+- One Regional Qualifier winner per region.
+
+Total teams:
+20.
+
+Tournament format:
+
+Swiss Stage:
+- 3 wins = advance.
+- 3 losses = elimination.
+- Teams play opponents with the same Swiss record.
+
+Then:
+- Playoffs.
+- Determine the World Champion.
+
+====================================================
+WORLD INTEGRATION
+====================================================
+
+The player-controlled team must be fully integrated into all systems:
+
+- Regional Leagues
+- Regional Playoffs
+- Majors
+- TI Points
+- The International
+- HLTV Rankings
+- Match History
+- Career Statistics
+
+No separate logic for the player team.
+
+====================================================
+IMPORTANT
+====================================================
+
+Do NOT simplify the existing systems.
+Do NOT remove any features already implemented.
+Do NOT rewrite the project from scratch.
+
+Only fix and complete the missing seasonal progression systems so the world simulation runs continuously from league play to Majors to The International every year.

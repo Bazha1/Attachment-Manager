@@ -183,13 +183,10 @@ def build_game_state(gs):
     month_name  = month_names[month - 1] if 1 <= month <= 12 else "?"
     week_label  = f"Week {week}, {month_name} {year}"
 
-    phase_map = {
-        1:"Winter League", 2:"Winter League", 3:"Winter League",
-        4:"Spring League", 5:"Spring League", 6:"Spring League",
-        7:"Major I",       8:"Summer League", 9:"Summer League",
-        10:"Summer League",11:"Major II",      12:"TI Season"
-    }
-    season_phase = phase_map.get(month, "Off-Season")
+    from config import SEASON_PHASES
+    from utils.time_utils import phase_for_month
+    p = phase_for_month(month)
+    season_phase = SEASON_PHASES.get(p, {}).get("label", p.title() if p else "Off-Season")
 
     # Season progress (use current_season, not calendar year)
     season_info = None
@@ -358,11 +355,15 @@ def handle_advance_week():
                         f"{len(all_results)} matches played worldwide.")
 
     save_state(gs)
+    state = build_game_state(gs)
     return {
-        "state":         build_game_state(gs),
+        "state":         state,
         "match_results": all_results,
         "new_news":      new_news,
         "week_summary":  week_summary,
+        "week":          state.get("week", 1),
+        "week_label":    state.get("week_label", ""),
+        "season_phase":  state.get("season_phase", ""),
     }
 
 
@@ -848,6 +849,7 @@ def handle_get_calendar():
                 "id":     tid,
                 "name":   t.get("name", ""),
                 "type":   t.get("type", ""),
+                "status": t.get("status", ""),
                 "winner": t.get("winner"),
             })
 

@@ -14,8 +14,12 @@ _tid_counter = [0]
 
 def create_tournament(name: str, ttype: str, tier: str,
                       region: str | None, year: int, month: int,
-                      participants: list, prize_pool: int = 0) -> dict:
-    tid = generate_id("t", _tid_counter)
+                      participants: list, prize_pool: int = 0,
+                      *, counter: list | None = None) -> dict:
+    # Use deterministic ID based on name+year to survive process-per-call
+    import hashlib
+    base = f"{name}-{year}-{month}"
+    tid = "t" + hashlib.md5(base.encode()).hexdigest()[:8]
     return {
         "id":           tid,
         "name":         name,
