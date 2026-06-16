@@ -32,6 +32,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <span className="text-muted-foreground">
               ${(state.budget / 1000).toFixed(0)}k
             </span>
+            <Link href="/setup">
+              <span className="text-[10px] font-medium bg-primary/10 text-primary hover:bg-primary/20 px-2 py-1 rounded transition-colors cursor-pointer">
+                + New Game
+              </span>
+            </Link>
           </div>
         )}
       </header>

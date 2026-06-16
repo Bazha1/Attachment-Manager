@@ -222,6 +222,15 @@ export default function DashboardPage() {
           <button className="btn-secondary w-full py-3">Manage Roster</button>
         </Link>
       </div>
+
+      {/* New Game */}
+      <div className="pt-1 text-center">
+        <Link href="/setup">
+          <button className="text-xs text-muted-foreground hover:text-primary transition-colors py-1">
+            + New Game
+          </button>
+        </Link>
+      </div>
     </div>
   );
 }
