@@ -15,14 +15,13 @@ WEEKS_PER_MONTH = 4
 START_YEAR = 2025
 START_MONTH = 1   # January
 
-# Season phases
+# Season phases (each cycle = 1-month league + 1-month major)
 SEASON_PHASES = {
-    "winter":  {"months": [1, 2, 3],        "label": "Winter League"},
-    "spring":  {"months": [4, 5, 6],        "label": "Spring League"},
-    "summer":  {"months": [8, 9, 10],       "label": "Summer League"},
-    "ti_qual": {"months": [11],             "label": "TI Qualification"},
-    "ti":      {"months": [12],             "label": "The International"},
-    "break":   {"months": [7],              "label": "July Break"},
+    "winter":  {"months": [1],        "label": "Winter League"},
+    "spring":  {"months": [4],        "label": "Spring League"},
+    "summer":  {"months": [8],        "label": "Summer League"},
+    "ti_qual": {"months": [11],       "label": "TI Qualification"},
+    "ti":      {"months": [12],       "label": "The International"},
 }
 
 # ─── Regions ────────────────────────────────────────────────────────────────
@@ -52,11 +51,11 @@ TI_QUALIFIER_SLOTS = 4   # one per region
 MAJOR_PRIZE_POOL  = 500_000      # USD
 TI_PRIZE_POOL     = 1_500_000    # at least 2.5× major
 
-# Major schedule: after which season
+# Major schedule: after which season (month after each 1-month league)
 MAJORS = [
-    {"name": "Major 1", "after_phase": "winter", "month": 4, "week": 1},
-    {"name": "Major 2", "after_phase": "spring", "month": 7, "week": 2},
-    {"name": "Major 3", "after_phase": "summer", "month": 11, "week": 1},
+    {"name": "Major 1", "after_phase": "winter", "month": 2, "week": 1},
+    {"name": "Major 2", "after_phase": "spring", "month": 5, "week": 1},
+    {"name": "Major 3", "after_phase": "summer", "month": 9, "week": 1},
 ]
 
 # ─── Season Pipeline ───────────────────────────────────────────────────────
@@ -70,11 +69,11 @@ SEASON_TI_POINTS = [1000, 800, 600, 400, 200, 200, 200, 200, 100, 100, 100, 100,
 # Regional playoff size (top N from league advance to playoff)
 REGIONAL_PLAYOFF_SIZE = 8
 
-# Combined season cycle definition
+# Combined season cycle definition (1-month league + 1-month major)
 SEASON_CYCLES = {
-    "cycle_1": {"league": "winter", "major": "Major 1", "major_month": 4, "major_week": 1},
-    "cycle_2": {"league": "spring", "major": "Major 2", "major_month": 7, "major_week": 2},
-    "cycle_3": {"league": "summer", "major": "Major 3", "major_month": 11, "major_week": 1},
+    "cycle_1": {"league": "winter", "major": "Major 1", "major_month": 2, "major_week": 1},
+    "cycle_2": {"league": "spring", "major": "Major 2", "major_month": 5, "major_week": 1},
+    "cycle_3": {"league": "summer", "major": "Major 3", "major_month": 9, "major_week": 1},
 }
 
 # ─── Player Roles ────────────────────────────────────────────────────────────

@@ -221,6 +221,7 @@ def build_game_state(gs):
         "news_count":    len(gs.get("news", [])),
         "week_label":    week_label,
         "season":        season_info,
+        "tournaments":   gs.get("tournaments", {}),
     }
 
 
@@ -246,9 +247,9 @@ def handle_new_game(data):
 
     gs["player_org_id"] = org_id
     gs["player_name"]   = manager_name
-    gs["week"]          = 1
-    gs["month"]         = 1
-    gs["year"]          = year
+    gs["week"]          = 4
+    gs["month"]         = 12
+    gs["year"]          = year - 1
     gs["news"]          = []
     gs["save_id"]       = str(uuid.uuid4())[:8]
 

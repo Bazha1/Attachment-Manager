@@ -48,14 +48,23 @@ def _default_prize(ttype: str) -> int:
 # ─── Round Robin (regional league) ──────────────────────────────────────────
 
 def generate_rr_schedule(participants: list) -> list:
-    """Return list of (team_a, team_b) pairs for a round-robin."""
-    pairs = []
-    n = len(participants)
-    for i in range(n):
-        for j in range(i + 1, n):
-            pairs.append((participants[i], participants[j]))
-    random.shuffle(pairs)
-    return pairs
+    """Generate round-robin schedule using circle method (round-based)."""
+    import random
+    teams = list(participants)
+    random.shuffle(teams)
+    n = len(teams)
+    if n % 2 == 1:
+        teams.append(None)
+    rounds = []
+    for round_idx in range(len(teams) - 1):
+        round_matches = []
+        for i in range(len(teams) // 2):
+            a, b = teams[i], teams[len(teams) - 1 - i]
+            if a and b:
+                round_matches.append((a, b))
+        rounds.append(round_matches)
+        teams = [teams[0]] + [teams[-1]] + teams[1:-1]
+    return rounds
 
 
 def init_rr_results(tournament: dict) -> None:
@@ -63,10 +72,18 @@ def init_rr_results(tournament: dict) -> None:
         tournament["results"][oid] = {
             "wins": 0, "losses": 0, "map_wins": 0, "map_losses": 0, "points": 0
         }
-    tournament["bracket"] = [
-        {"team_a": a, "team_b": b, "played": False, "winner": None, "score": ""}
-        for a, b in generate_rr_schedule(tournament["participants"])
-    ]
+    rounds = generate_rr_schedule(tournament["participants"])
+    match_id = 0
+    tournament["bracket"] = []
+    for r_idx, round_matches in enumerate(rounds):
+        for a, b in round_matches:
+            tournament["bracket"].append({
+                "id": f"m{match_id}",
+                "team_a": a, "team_b": b,
+                "played": False, "winner": None, "score": "",
+                "round": r_idx + 1,
+            })
+            match_id += 1
     tournament["status"] = "ongoing"
 
 

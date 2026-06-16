@@ -38,20 +38,19 @@ def advance_time(gs: dict) -> list:
     """
     events_log = []
 
-    # 1. Ensure season state exists
-    y = gs.get("year", 2025)
-    if not gs.get("seasons"):
-        init_season_state(gs, y)
-        gs["current_season"] = y
-    # If year changed and current season isn't complete, keep current_season
-    # pointing to the active season year. This prevents season data from
-    # resetting when the calendar rolls into January.
-
     # 2. Advance calendar
     gs["year"], gs["month"], gs["week"] = advance_week(
         gs["year"], gs["month"], gs["week"])
 
     y, m, w = gs["year"], gs["month"], gs["week"]
+
+    # 1. Ensure season state exists for current year
+    if not gs.get("seasons"):
+        init_season_state(gs, y)
+        gs["current_season"] = y
+    elif str(y) not in gs.get("seasons", {}):
+        init_season_state(gs, y)
+    gs["current_season"] = y
     gs["current_date"] = date_str(y, m, w)
 
     # 3. Check and trigger scheduled events
@@ -83,14 +82,16 @@ def _check_calendar_events(gs: dict) -> list:
             if tourn["status"] == "ongoing":
                 log += _run_league_week(gs, tourn, region)
 
-        # Finalise league at last week of last month in phase
-        phase_months = SEASON_PHASES[phase]["months"]
-        if m == phase_months[-1] and w == 4:
+        # Finalise league on week 4 (after 3 gamedays) and trigger playoff
+        if w == 4:
             for region in REGIONS:
                 key = f"league_{region}_{phase}_{y}"
                 tourn = gs["tournaments"].get(key)
                 if tourn and tourn["status"] == "ongoing":
                     log += _finalise_league(gs, tourn, region)
+                    # Immediately create and run playoff in the same week
+                    playoff_log = _create_and_run_playoff(gs, tourn, region, phase, y)
+                    log.extend(playoff_log)
 
     # ── Regional Playoffs (auto-created by season pipeline after league) ──
     for tourn in list(gs["tournaments"].values()):
@@ -208,11 +209,17 @@ def _create_league(gs: dict, region: str, phase: str,
 
 def _run_league_week(gs: dict, tourn: dict, region: str) -> list:
     log = []
+    w = gs.get("week", 1)
     unplayed = [m for m in tourn["bracket"] if not m["played"]]
     if not unplayed:
         return log
-    # Play up to 4 matches per week
-    matches_this_week = unplayed[:4]
+    # 3 gamedays: weeks 1, 2, 3 each play 5 rounds (5 matches per team)
+    # Round grouping: rounds 1-5 on week 1, 6-10 on week 2, 11-15 on week 3
+    if w > 3:
+        return log
+    round_start = (w - 1) * 5 + 1
+    round_end = w * 5
+    matches_this_week = [m for m in unplayed if round_start <= m["round"] <= round_end]
     for m in matches_this_week:
         oid_a, oid_b = m["team_a"], m["team_b"]
         org_a = gs["orgs"].get(oid_a)
@@ -304,11 +311,55 @@ def _finalise_league(gs: dict, tourn: dict, region: str) -> list:
     return log
 
 
+def _create_and_run_playoff(gs: dict, league_tourn: dict, region: str, phase: str, year: int) -> list:
+    """Create and run a regional playoff from league standings in one week."""
+    log = []
+    from engine.season_engine import get_season, create_regional_playoffs, record_playoff_result
+    season = get_season(gs, year)
+    if not season:
+        return log
+    cycle_id = {"winter": "cycle_1", "spring": "cycle_2", "summer": "cycle_3"}.get(phase, "")
+    if not cycle_id:
+        return log
+
+    cycle = season["cycles"][cycle_id]
+
+    # Skip if already completed
+    if cycle["playoffs"].get(region, {}).get("status") == "completed":
+        return log
+
+    # Create playoff (or use existing from season state)
+    playoff = None
+    if region in cycle["playoffs"] and cycle["playoffs"][region].get("status") == "ongoing":
+        playoff = gs["tournaments"].get(cycle["playoffs"][region]["tournament_id"])
+
+    if not playoff:
+        playoff = create_regional_playoffs(gs, region, cycle_id, year)
+        if not playoff:
+            return log
+        gs["tournaments"][playoff["id"]] = playoff
+        cycle["playoffs"][region] = {
+            "tournament_id": playoff["id"],
+            "status": "ongoing",
+        }
+
+    log.append({"type": "playoff_created", "region": region, "cycle": cycle_id,
+                "tournament_id": playoff["id"]})
+
+    # Run playoff to completion
+    log += _run_se_tournament(gs, playoff)
+
+    # Record result for season pipeline
+    pipeline_log = record_playoff_result(gs, playoff)
+    log.extend(pipeline_log)
+    return log
+
+
 # ─── Major ────────────────────────────────────────────────────────────────
 
 def _create_major(gs: dict, major_def: dict, year: int) -> dict | None:
     # Gather qualified teams from the just-finished league cycle
-    phase_map = {4: "winter", 7: "spring", 11: "summer"}
+    phase_map = {1: "winter", 2: "winter", 4: "spring", 5: "spring", 8: "summer", 9: "summer"}
     phase = phase_map.get(major_def["month"], "winter")
     major_key = f"major_{phase}_{year}"
     qualified = gs.get("major_qualified", {}).get(major_key, [])

@@ -178,7 +178,7 @@ def create_regional_playoffs(gs: dict, region: str, cycle_id: str, year: int) ->
 
 def _playoff_month_for_cycle(cycle_id: str) -> int:
     """Return the month when playoffs should happen."""
-    cycle_map = {"cycle_1": 4, "cycle_2": 7, "cycle_3": 11}
+    cycle_map = {"cycle_1": 1, "cycle_2": 4, "cycle_3": 8}
     return cycle_map.get(cycle_id, 1)
 
 
