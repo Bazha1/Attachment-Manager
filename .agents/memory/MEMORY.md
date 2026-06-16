@@ -1,2 +1,4 @@
 - [CS Manager game](cs-manager.md) — full Python console game in cs_manager/; run with `cd cs_manager && python3 main.py`; no external deps.
 - [CS Manager web bridge](cs-manager-web.md) — React+Vite frontend + Node api-server calling Python via spawn stdin/stdout; critical stdout redirect fix required.
+- [Python game state field names](python-field-names.md) — players use `nickname` (not name/alias), `stats.hltv_rating`, `contract.salary`; orgs use `reputation` (not rating/tier); tier derived via `_tier_from_rep(rep)`.
+- [Tournament bracket shape](tournament-shapes.md) — brackets use `team_a/team_b` org IDs (not `team_a_id`), score is string `"2-1"` (not separate ints); standings in `league.results[org_id].{wins,losses,points}`.

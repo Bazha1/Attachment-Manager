@@ -72,18 +72,28 @@ function gameRoute(action: string, dataFn?: (req: import("express").Request) => 
   };
 }
 
-router.get("/game/orgs", gameRoute("list_orgs"));
-router.post("/game/new", gameRoute("new_game", (req) => req.body));
-router.get("/game/state", gameRoute("get_state"));
+// ── Existing routes ──────────────────────────────────────────────────────────
+router.get("/game/orgs",   gameRoute("list_orgs"));
+router.post("/game/new",   gameRoute("new_game", (req) => req.body));
+router.get("/game/state",  gameRoute("get_state"));
 router.post("/game/advance", gameRoute("advance_week"));
 router.get("/game/roster", gameRoute("get_roster"));
-router.post("/game/roster/release/:playerId", gameRoute("release_player", (req) => ({ player_id: req.params.playerId })));
-router.post("/game/roster/sign/:playerId", gameRoute("sign_player", (req) => ({ player_id: req.params.playerId })));
-router.post("/game/academy/promote/:playerId", gameRoute("promote_player", (req) => ({ player_id: req.params.playerId })));
-router.get("/game/news", gameRoute("get_news"));
-router.get("/game/rankings", gameRoute("get_rankings"));
+router.post("/game/roster/release/:playerId",
+  gameRoute("release_player", (req) => ({ player_id: req.params.playerId })));
+router.post("/game/roster/sign/:playerId",
+  gameRoute("sign_player", (req) => ({ player_id: req.params.playerId })));
+router.post("/game/academy/promote/:playerId",
+  gameRoute("promote_player", (req) => ({ player_id: req.params.playerId })));
+router.get("/game/news",      gameRoute("get_news"));
+router.get("/game/rankings",  gameRoute("get_rankings"));
 router.get("/game/transfers", gameRoute("get_transfers"));
-router.get("/game/fixtures", gameRoute("get_fixtures"));
-router.get("/game/results", gameRoute("get_results"));
+router.get("/game/fixtures",  gameRoute("get_fixtures"));
+router.get("/game/results",   gameRoute("get_results"));
+
+// ── New routes ───────────────────────────────────────────────────────────────
+router.get("/game/calendar",
+  gameRoute("get_calendar"));
+router.post("/game/transfers/buy/:playerId",
+  gameRoute("transfer_player", (req) => ({ player_id: req.params.playerId })));
 
 export default router;

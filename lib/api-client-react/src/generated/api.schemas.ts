@@ -104,6 +104,18 @@ export interface PlayerCard {
   attributes?: PlayerCardAttributes;
 }
 
+export interface ContractedPlayer extends PlayerCard {
+  current_org: string;
+  current_org_tag: string;
+  transfer_fee: number;
+  can_afford: boolean;
+}
+
+export interface TransferMarket {
+  free_agents: PlayerCard[];
+  contracted: ContractedPlayer[];
+}
+
 export interface RosterData {
   roster: PlayerCard[];
   academy: PlayerCard[];
@@ -133,3 +145,42 @@ export interface Fixture {
   round: string;
 }
 
+export interface LeagueStanding {
+  rank: number;
+  org_id: string;
+  name: string;
+  tag: string;
+  wins: number;
+  losses: number;
+  map_diff: number;
+  points: number;
+  is_player: boolean;
+}
+
+export interface LeagueTournament {
+  id: string;
+  name: string;
+  status: string;
+  standings: LeagueStanding[];
+  player_record: { wins: number; losses: number; points: number };
+  upcoming_matches: Array<{ opponent_name: string; opponent_tag: string }>;
+  total_matches: number;
+  played_matches: number;
+}
+
+export interface CalendarData {
+  current_phase: string;
+  phase_key: string;
+  phase_progress: number;
+  upcoming_events: string[];
+  /** @nullable */
+  player_league?: LeagueTournament | null;
+  active_tournaments: Array<{ id: string; name: string; type: string; winner?: string | null }>;
+  week_label: string;
+}
+
+export interface TransferResult {
+  success: boolean;
+  player_name: string;
+  fee: number;
+}

@@ -21,6 +21,8 @@ import type {
 
 import type {
   AdvanceResult,
+  CalendarData,
+  ContractedPlayer,
   ErrorResponse,
   Fixture,
   GameState,
@@ -31,7 +33,9 @@ import type {
   OrgSummary,
   PlayerCard,
   RankingEntry,
-  RosterData
+  RosterData,
+  TransferMarket,
+  TransferResult,
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -868,11 +872,11 @@ export const getGetTransfersUrl = () => {
 }
 
 /**
- * @summary Get free agents available to sign
+ * @summary Get transfer market: free agents + contracted players
  */
-export const getTransfers = async ( options?: RequestInit): Promise<PlayerCard[]> => {
+export const getTransfers = async ( options?: RequestInit): Promise<TransferMarket> => {
 
-  return customFetch<PlayerCard[]>(getGetTransfersUrl(),
+  return customFetch<TransferMarket>(getGetTransfersUrl(),
   {
     ...options,
     method: 'GET'
@@ -1083,6 +1087,73 @@ export function useGetResults<TData = Awaited<ReturnType<typeof getResults>>, TE
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+// ─── Calendar ────────────────────────────────────────────────────────────────
+
+export const getGetCalendarUrl = () => `/api/game/calendar`;
+
+export const getCalendar = async ( options?: RequestInit): Promise<CalendarData> => {
+  return customFetch<CalendarData>(getGetCalendarUrl(), { ...options, method: 'GET' });
+};
+
+export const getGetCalendarQueryKey = () => [`/api/game/calendar`] as const;
+
+export const getGetCalendarQueryOptions = <TData = Awaited<ReturnType<typeof getCalendar>>, TError = ErrorType<unknown>>(
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getGetCalendarQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCalendar>>> = ({ signal }) =>
+    getCalendar({ signal, ...requestOptions });
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData> & { queryKey: QueryKey };
+};
+
+export type GetCalendarQueryResult = NonNullable<Awaited<ReturnType<typeof getCalendar>>>;
+export type GetCalendarQueryError = ErrorType<unknown>;
+
+export function useGetCalendar<TData = Awaited<ReturnType<typeof getCalendar>>, TError = ErrorType<unknown>>(
+  options?: { query?: UseQueryOptions<Awaited<ReturnType<typeof getCalendar>>, TError, TData>, request?: SecondParameter<typeof customFetch> }
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCalendarQueryOptions(options);
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: QueryKey };
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+// ─── Buy Player (club-to-club transfer) ──────────────────────────────────────
+
+export const getBuyPlayerUrl = (playerId: string) => `/api/game/transfers/buy/${playerId}`;
+
+export const buyPlayer = async (playerId: string, options?: RequestInit): Promise<TransferResult> => {
+  return customFetch<TransferResult>(getBuyPlayerUrl(playerId), { ...options, method: 'POST' });
+};
+
+export const getBuyPlayerMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof buyPlayer>>, TError, { playerId: string }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationOptions<Awaited<ReturnType<typeof buyPlayer>>, TError, { playerId: string }, TContext> => {
+  const mutationKey = ['buyPlayer'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof buyPlayer>>, { playerId: string }> = (props) => {
+    const { playerId } = props ?? {};
+    return buyPlayer(playerId, requestOptions);
+  };
+  return { mutationFn, ...mutationOptions };
+};
+
+export type BuyPlayerMutationResult = NonNullable<Awaited<ReturnType<typeof buyPlayer>>>;
+export type BuyPlayerMutationError = ErrorType<unknown>;
+
+export const useBuyPlayer = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof buyPlayer>>, TError, { playerId: string }, TContext>, request?: SecondParameter<typeof customFetch> }
+): UseMutationResult<Awaited<ReturnType<typeof buyPlayer>>, TError, { playerId: string }, TContext> => {
+  return useMutation(getBuyPlayerMutationOptions(options));
+};
 
 
 
